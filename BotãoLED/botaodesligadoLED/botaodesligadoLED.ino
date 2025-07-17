@@ -1,5 +1,5 @@
-const int LED = D1;     // GPIO5 (seguro para saída)
-const int BOTAO = D2;   // GPIO4 (seguro para entrada)
+const int LED = ;     // PINOS
+const int BOTAO = ;   // PINOS
 
 void setup() {
   pinMode(LED, OUTPUT);     
