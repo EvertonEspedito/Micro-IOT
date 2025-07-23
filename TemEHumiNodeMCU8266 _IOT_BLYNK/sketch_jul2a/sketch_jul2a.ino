@@ -1,11 +1,9 @@
 #include "DHT.h"
 
 // Define os pinos usando GPIO do NodeMCU
-#define DHTPIN D7          // GPIO4
+#define DHTPIN D7        
 #define DHTTYPE DHT11
 
-#define ALERT_PIN D5       // GPIO14 - LED vermelho
-#define OK_PIN D6          // GPIO12 - LED verde
 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -13,8 +11,6 @@ void setup() {
   Serial.begin(9600);
   dht.begin();
 
-  pinMode(ALERT_PIN, OUTPUT);
-  pinMode(OK_PIN, OUTPUT);
 }
 
 void loop() {
@@ -35,12 +31,4 @@ void loop() {
   Serial.print(t);
   Serial.println(" °C");
 
-  if (t >= 50.5) {
-    digitalWrite(ALERT_PIN, HIGH);  // Liga LED vermelho
-    digitalWrite(OK_PIN, LOW);
-    Serial.println("⚠️ ALERTA: Temperatura alta!");
-  } else {
-    digitalWrite(ALERT_PIN, LOW);
-    digitalWrite(OK_PIN, HIGH);     // Liga LED verde
-  }
 }
