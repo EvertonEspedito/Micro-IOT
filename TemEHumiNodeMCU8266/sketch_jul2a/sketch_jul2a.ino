@@ -1,9 +1,11 @@
 #include "DHT.h"
 
-#define DHTPIN 7          // Pino de dados do DHT11 (ajustado para pino 7 no Uno)
-#define DHTTYPE DHT11     // Tipo do sensor DHT
-#define ALERT_PIN 13      // Pino de alerta (LED vermelho)
-#define OK_PIN 12         // Pino de OK (LED verde)
+// Define os pinos usando GPIO do NodeMCU
+#define DHTPIN D7          // GPIO4
+#define DHTTYPE DHT11
+
+#define ALERT_PIN D5       // GPIO14 - LED vermelho
+#define OK_PIN D6          // GPIO12 - LED verde
 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -11,15 +13,15 @@ void setup() {
   Serial.begin(9600);
   dht.begin();
 
-  pinMode(ALERT_PIN, OUTPUT); // Configura LED de alerta
-  pinMode(OK_PIN, OUTPUT);    // Configura LED de OK
+  pinMode(ALERT_PIN, OUTPUT);
+  pinMode(OK_PIN, OUTPUT);
 }
 
 void loop() {
-  delay(5000); // Aguarda 5 segundos entre leituras
+  delay(5000); // Aguarda 5 segundos
 
-  float h = dht.readHumidity();      // Lê umidade
-  float t = dht.readTemperature();   // Lê temperatura em Celsius
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
 
   if (isnan(h) || isnan(t)) {
     Serial.println("Falha na leitura do sensor DHT!");
@@ -35,10 +37,10 @@ void loop() {
 
   if (t >= 50.5) {
     digitalWrite(ALERT_PIN, HIGH);  // Liga LED vermelho
-    digitalWrite(OK_PIN, LOW);      // Desliga LED verde
+    digitalWrite(OK_PIN, LOW);
     Serial.println("⚠️ ALERTA: Temperatura alta!");
   } else {
-    digitalWrite(ALERT_PIN, LOW);   // Desliga LED vermelho
+    digitalWrite(ALERT_PIN, LOW);
     digitalWrite(OK_PIN, HIGH);     // Liga LED verde
   }
 }
