@@ -1,5 +1,5 @@
 int pinoPIR = 2;
-int pinoLED = 12;
+int pinoLED = 13;
 
 void setup() {
   pinMode(pinoPIR, INPUT);
@@ -12,9 +12,12 @@ void loop() {
     Serial.println("Movimento detectado!");
     digitalWrite(pinoLED, HIGH);
     delay(5000);
-  } else {
+  } 
+  if (digitalRead(pinoPIR) == LOW) {
+    Serial.println("Nenhum Movimento Detectado!");
     digitalWrite(pinoLED, LOW);
+  
   }
 
-  delay(100);
+  delay(2000);
 }
