@@ -3,8 +3,7 @@ int pinoLED = 6;    // Pino PWM do LED
 int valorPot = 0;   // Para guardar leitura
 
 void setup() {
-  pinMode(pinoLED, OUTPUT);
-  Serial.begin(9600);  // Para monitorar valores
+  pinMode(pinoLED, OUTPUT)
 }
 
 void loop() {
@@ -16,12 +15,6 @@ void loop() {
 
   // Ajusta brilho do LED
   analogWrite(pinoLED, brilho);
-
-  // Mostra valor no Serial Monitor
-  Serial.print("Potenciometro: ");
-  Serial.print(valorPot);
-  Serial.print("  |  LED: ");
-  Serial.println(brilho);
 
   delay(10);  // Pequeno atraso
 }

@@ -3,6 +3,7 @@ const int pinLeds = 9;
 const int pinPotAllLeds = A0;    
 const int pinBuzzerLeft = 2;     
 const int pinBuzzerRight = 3;    
+const int pinButtonOnOff = 13;   // Botão de liga/desliga
 
 float luminosidadeLEDS = 0;
 
@@ -15,26 +16,46 @@ int noteIndex = 0;
 unsigned long noteStartTime = 0;
 bool tocando = false;
 
+// Controle do sistema
+bool sistemaLigado = false;      // começa desligado
+bool ultimoEstadoBotao = HIGH;   // botão não pressionado (pull-up)
+
 void setup() {
   pinMode(pinLeds, OUTPUT);
   pinMode(pinPotAllLeds, INPUT);
   pinMode(pinBuzzerLeft, OUTPUT);
   pinMode(pinBuzzerRight, OUTPUT);
+  pinMode(pinButtonOnOff, INPUT_PULLUP); // usa resistor interno
 }
 
 void loop() {
-  // Lê potenciômetro
+  bool estadoBotao = digitalRead(pinButtonOnOff);
+
+  if (estadoBotao == LOW && ultimoEstadoBotao == HIGH) {
+    sistemaLigado = !sistemaLigado;
+
+    if (!sistemaLigado) {
+      pararMusica();
+      analogWrite(pinLeds, 0);
+    }
+
+    delay(200); // debounce
+  }
+  ultimoEstadoBotao = estadoBotao;
+
+  if (!sistemaLigado) return;
+
   luminosidadeLEDS = map(analogRead(pinPotAllLeds), 0, 1023, 0, 255);
   analogWrite(pinLeds, luminosidadeLEDS);
 
   if (luminosidadeLEDS > 0) {
-    if (!tocando) { // Começa música só se ainda não estiver tocando
+    if (!tocando) {
       noteIndex = 0;
       tocarNota();
       tocando = true;
     }
     avancarMusica();
-  } else if (tocando) { // Para música uma vez
+  } else if (tocando) {
     pararMusica();
   }
 }
@@ -52,7 +73,6 @@ void avancarMusica() {
     noTone(pinBuzzerLeft);
     noTone(pinBuzzerRight);
 
-    // Pausa curta entre notas (50ms)
     if (millis() - noteStartTime >= noteDuration + 50) {
       noteIndex++;
       if (noteIndex >= 14) noteIndex = 0;
