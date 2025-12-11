@@ -44,3 +44,5 @@ void loop() {
     digitalWrite(OK_PIN, HIGH);     // Liga LED verde
   }
 }
+
+
