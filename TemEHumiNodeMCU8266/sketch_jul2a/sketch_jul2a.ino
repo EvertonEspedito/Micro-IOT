@@ -1,48 +1,53 @@
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
 #include "DHT.h"
 
-// Define os pinos usando GPIO do NodeMCU
-#define DHTPIN D7          // GPIO4
+#define DHTPIN D7
 #define DHTTYPE DHT11
 
-#define ALERT_PIN D5       // GPIO14 - LED vermelho
-#define OK_PIN D6          // GPIO12 - LED verde
+const char* ssid = "F-IFSertao-PE-ALUNOS";
+const char* password = "#ifsertao@aluno#";
+
+const char* servidor = "http://10.103.32.51:8000/api/leitura/";
 
 DHT dht(DHTPIN, DHTTYPE);
 
 void setup() {
   Serial.begin(9600);
-  dht.begin();
+  WiFi.begin(ssid, password);
 
-  pinMode(ALERT_PIN, OUTPUT);
-  pinMode(OK_PIN, OUTPUT);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("\nWiFi conectado!");
+  Serial.println(WiFi.localIP());
+
+  dht.begin();
 }
 
 void loop() {
-  delay(5000); // Aguarda 5 segundos
-
   float h = dht.readHumidity();
   float t = dht.readTemperature();
 
-  if (isnan(h) || isnan(t)) {
-    Serial.println("Falha na leitura do sensor DHT!");
-    return;
-  }
+  if (isnan(h) || isnan(t)) return;
 
-  Serial.print("Umidade: ");
-  Serial.print(h);
-  Serial.print(" %\t");
-  Serial.print("Temperatura: ");
-  Serial.print(t);
-  Serial.println(" °C");
+  WiFiClient client;
+  HTTPClient http;
 
-  if (t >= 50.5) {
-    digitalWrite(ALERT_PIN, HIGH);  // Liga LED vermelho
-    digitalWrite(OK_PIN, LOW);
-    Serial.println("⚠️ ALERTA: Temperatura alta!");
-  } else {
-    digitalWrite(ALERT_PIN, LOW);
-    digitalWrite(OK_PIN, HIGH);     // Liga LED verde
-  }
+  String json = "{\"temperatura\":" + String(t) +
+                ",\"umidade\":" + String(h) + "}";
+
+  http.begin(client, servidor);
+  http.addHeader("Content-Type", "application/json");
+
+  int httpCode = http.POST(json);
+
+  Serial.print("Código HTTP: ");
+  Serial.println(httpCode);
+
+  http.end();
+
+  delay(5000);
 }
-
-
