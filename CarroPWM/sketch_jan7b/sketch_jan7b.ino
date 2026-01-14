@@ -96,36 +96,34 @@ void parar() {
 // ==========================
 void loop() {
 
-  delay(4000);
-  // Frente
-  frente();
-  delay(3000);
+parar();
+delay(4000);
 
-  // Parar
-  parar();
-  delay(1000);
+// Função Frente
+frente();
+delay(3000);
 
-  // Trás
-  tras();
-  delay(3000);
+// Função Parar
+parar();
+delay(1000);
 
-  // Parar
-  parar();
-  delay(1000);
+//Virar a esquerda
+esquerda();
+delay(2000);
 
-  // Virar à esquerda
-  esquerda();
-  delay(2000);
+// Função Frente
+frente();
+delay(3000);
 
-  // Parar
-  parar();
-  delay(1000);
+// Virar a Direita
+direita();
+delay(4000);
 
-  // Virar à direita
-  direita();
-  delay(2000);
+// Frente
+frente();
+delay(12000);
 
-  // Parar
-  parar();
-  delay(3000);
+parar();
+delay(6000);
+
 }
