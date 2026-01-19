@@ -95,35 +95,13 @@ void parar() {
 // LOOP – SEQUÊNCIA DE TESTE
 // ==========================
 void loop() {
+  parar();
+  delay(3000);
 
-parar();
-delay(4000);
+  tras();
+  delay(5000);
 
-// Função Frente
-frente();
-delay(3000);
-
-// Função Parar
-parar();
-delay(1000);
-
-//Virar a esquerda
-esquerda();
-delay(2000);
-
-// Função Frente
-frente();
-delay(3000);
-
-// Virar a Direita
-direita();
-delay(4000);
-
-// Frente
-frente();
-delay(12000);
-
-parar();
-delay(6000);
+  frente();
+  delay(5000);
 
 }
