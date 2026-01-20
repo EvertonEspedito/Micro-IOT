@@ -2,8 +2,8 @@
 // DEFINIÇÃO DOS PINOS
 // ==========================
 int ENA = 5;   // PWM Motor A
-int IN1 = 6;
-int IN2 = 7;
+int IN1 = 6;  // Rotação Frente Motor A
+int IN2 = 7; // Rotação Trás Motor A
 
 int ENB = 9;   // PWM Motor B
 int IN3 = 10;
@@ -32,7 +32,7 @@ void setup() {
 // ==========================
 
 // Andar para frente
-void frente() {
+void frente( ) {
   analogWrite(ENA, velocidade);
   analogWrite(ENB, velocidade);
 
@@ -91,10 +91,8 @@ void parar() {
   digitalWrite(IN4, LOW);
 }
 
-// ==========================
-// LOOP – SEQUÊNCIA DE TESTE
-// ==========================
-void loop() {
+// Função Patrulha
+void patrulha (){
   parar();
   delay(3000);
 
@@ -103,5 +101,11 @@ void loop() {
 
   frente();
   delay(5000);
+}
 
+// ==========================
+// LOOP – SEQUÊNCIA DE TESTE
+// ==========================
+void loop() {
+  patrulha();
 }
