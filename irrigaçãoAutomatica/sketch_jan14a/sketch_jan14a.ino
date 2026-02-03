@@ -6,7 +6,6 @@ float AnalogOutput = 0;
 float voltage = 0;
 int LeituraSensor = 0;
 
-// Ajuste conforme seu sensor
 int soloSeco = 700;     // valor alto = seco
 int soloUmido = 400;   // valor baixo = molhado
 
