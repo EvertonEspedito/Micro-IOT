@@ -1,88 +1,130 @@
 // Pinos
-const int pinLeds = 9;           
-const int pinPotAllLeds = A0;    
-const int pinBuzzerLeft = 2;     
-const int pinBuzzerRight = 3;    
-const int pinButtonOnOff = 13;   // Botão de liga/desliga
+const int pinLeds = 9;
+const int pinPotAllLeds = A0;
+const int pinBuzzerLeft = 2;
+const int pinBuzzerRight = 3;
+const int pinButtonOnOff = 13;
 
-float luminosidadeLEDS = 0;
+// Variáveis
+int luminosidadeLEDS = 0;
 
-// Notas da música
-int melody[] = { 262, 294, 330, 262, 262, 294, 330, 262, 330, 349, 392, 330, 349, 392 };
-int noteDurations[] = { 4,4,4,4,4,4,4,4,4,4,4,4,4,4 };
+bool sistemaLigado = false;
+bool ultimoEstadoBotao = HIGH;
 
-// Controle da música
+// Música
+int melody[] = {
+  262, 294, 330, 262,
+  262, 294, 330, 262,
+  330, 349, 392,
+  330, 349, 392
+};
+
+int noteDurations[] = {
+  4,4,4,4,
+  4,4,4,4,
+  4,4,4,
+  4,4,4
+};
+
 int noteIndex = 0;
-unsigned long noteStartTime = 0;
-bool tocando = false;
 
-// Controle do sistema
-bool sistemaLigado = false;      // começa desligado
-bool ultimoEstadoBotao = HIGH;   // botão não pressionado (pull-up)
+unsigned long noteStartTime = 0;
+bool tocandoNota = false;
 
 void setup() {
+
   pinMode(pinLeds, OUTPUT);
-  pinMode(pinPotAllLeds, INPUT);
+
   pinMode(pinBuzzerLeft, OUTPUT);
   pinMode(pinBuzzerRight, OUTPUT);
-  pinMode(pinButtonOnOff, INPUT_PULLUP); // usa resistor interno
+
+  pinMode(pinButtonOnOff, INPUT_PULLUP);
 }
 
 void loop() {
+
+  // ===== BOTÃO =====
   bool estadoBotao = digitalRead(pinButtonOnOff);
 
   if (estadoBotao == LOW && ultimoEstadoBotao == HIGH) {
+
     sistemaLigado = !sistemaLigado;
 
     if (!sistemaLigado) {
-      pararMusica();
+
+      noTone(pinBuzzerLeft);
+      noTone(pinBuzzerRight);
+
       analogWrite(pinLeds, 0);
     }
 
-    delay(200); // debounce
+    delay(200);
   }
+
   ultimoEstadoBotao = estadoBotao;
 
   if (!sistemaLigado) return;
 
-  luminosidadeLEDS = map(analogRead(pinPotAllLeds), 0, 1023, 0, 255);
+  // ===== POTENCIÔMETRO =====
+  luminosidadeLEDS =
+    map(analogRead(pinPotAllLeds), 0, 1023, 0, 255);
+
   analogWrite(pinLeds, luminosidadeLEDS);
 
-  if (luminosidadeLEDS > 0) {
-    if (!tocando) {
-      noteIndex = 0;
-      tocarNota();
-      tocando = true;
-    }
-    avancarMusica();
-  } else if (tocando) {
-    pararMusica();
-  }
-}
+// ===== DESLIGA SOM SE FOR ZERO =====
+if (luminosidadeLEDS <= 5) {
 
-void tocarNota() {
-  int noteDuration = 1000 / noteDurations[noteIndex];
-  tone(pinBuzzerLeft, melody[noteIndex]);
-  tone(pinBuzzerRight, melody[noteIndex] + 20);
-  noteStartTime = millis();
-}
+  if (tocandoNota) {
 
-void avancarMusica() {
-  int noteDuration = 1000 / noteDurations[noteIndex];
-  if (millis() - noteStartTime >= noteDuration) {
     noTone(pinBuzzerLeft);
     noTone(pinBuzzerRight);
 
-    if (millis() - noteStartTime >= noteDuration + 50) {
-      noteIndex++;
-      if (noteIndex >= 14) noteIndex = 0;
-      tocarNota();
-    }
+    tocandoNota = false;
+
+    // Reinicia música
+    noteIndex = 0;
   }
+
+  return;
 }
 
-void pararMusica() {
-  noTone(pinBuzzerLeft);
-  noTone(pinBuzzerRight);
-  tocando = false;
+  // ===== MÚSICA =====
+
+  int noteDuration =
+    1000 / noteDurations[noteIndex];
+
+  // Quanto menor o potenciômetro,
+  // menor o tempo do som
+  int tempoSom =
+    map(luminosidadeLEDS, 1, 255, 20, noteDuration);
+
+  // Toca nota
+  if (!tocandoNota) {
+
+    tone(pinBuzzerLeft, melody[noteIndex]);
+    tone(pinBuzzerRight, melody[noteIndex] + 20);
+
+    noteStartTime = millis();
+
+    tocandoNota = true;
+  }
+
+  // Desliga antes do fim para simular volume
+  if (millis() - noteStartTime >= tempoSom) {
+
+    noTone(pinBuzzerLeft);
+    noTone(pinBuzzerRight);
+  }
+
+  // Próxima nota
+  if (millis() - noteStartTime >= noteDuration) {
+
+    noteIndex++;
+
+    if (noteIndex >= 14) {
+      noteIndex = 0;
+    }
+
+    tocandoNota = false;
+  }
 }
